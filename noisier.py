@@ -5,7 +5,6 @@ import datetime
 import json
 import random
 import re
-import sys
 import time
 import requests
 from requests.exceptions import SSLError, RequestException, ReadTimeout
@@ -24,7 +23,7 @@ import logging
 
 ##
 ## This prevents WARNING messages from urllib3 appearing in 
-## default INFO logging. 
+## default INFO logging.
 ##
 logging.getLogger("urllib3").setLevel(logging.ERROR)
 
@@ -40,7 +39,7 @@ class Crawler(object):
         self.count_visit = 0
         self.count_error = 0
         self.count_bad_url = 0
-        self.kbytes_transferred = 0 
+        self.kbytes_transferred = 0
 
     class CrawlerTimedOut(Exception):
         """
@@ -57,17 +56,18 @@ class Crawler(object):
         random_user_agent = random.choice(self._config["user_agents"])
         headers = {'user-agent': random_user_agent}
 
-        session = requests.Session() 
+        session = requests.Session()
 
-        retry = Retry(total=3, 
-                    backoff_factor=1,
-                    status_forcelist=[500, 502, 503, 504],
-                    allowed_methods=["HEAD", "GET", "OPTIONS", "POST"]
+        retry = Retry(
+                        total=3,
+                        backoff_factor=1,
+                        status_forcelist=[500, 502, 503, 504],
+                        allowed_methods=["HEAD", "GET", "OPTIONS", "POST"]
                     )
 
         adapter = HTTPAdapter(max_retries=retry)
-        session.mount('http://', adapter) 
-        session.mount('https://', adapter) 
+        session.mount('http://', adapter)
+        session.mount('https://', adapter)
 
         try:
             response = session.get(url, headers=headers, timeout=3)
@@ -214,6 +214,7 @@ class Crawler(object):
 
         try:
             ip_address = socket.gethostbyname(fqdn)
+            logging.debug(f"Resolved IP Address: {ip_address}")
         except socket.gaierror:
             self._remove_and_blacklist(random_link)
 
@@ -323,13 +324,14 @@ class Crawler(object):
                 continue
             try:
                 ip_address = socket.gethostbyname(fqdn)
+                logging.debug(f"Resolved IP Address: {ip_address}")
             except socket.gaierror:
                 bad_urls.add(url)
                 self.count_bad_url += 1
                 continue
 
             try:
-                response = self._request(url) 
+                response = self._request(url)
                 if response is None:
                     bad_urls.add(url)
                     self.count_bad_url += 1
@@ -344,7 +346,7 @@ class Crawler(object):
             except requests.exceptions.RequestException:
                 logging.warning("Error connecting to root url: {}".format(url))
                 self.count_error += 1
-                
+
             except MemoryError:
                 logging.warning("Error: content at url: {} is exhausting the memory".format(url))
                 self.count_error += 1
@@ -356,6 +358,7 @@ class Crawler(object):
             except self.CrawlerTimedOut:
                 logging.info("Timeout has exceeded, exiting")
                 return
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -381,6 +384,7 @@ def main():
     logging.info("Starting Noisier!")
 
     crawler.crawl()
+
 
 if __name__ == '__main__':
     main()
