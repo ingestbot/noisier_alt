@@ -376,9 +376,9 @@ def main():
     level = getattr(logging, args.log.upper(), logging.INFO)
 
     logging.basicConfig(
-      format='%(asctime)s %(levelname)-8s %(message)s',
-      level=level,
-      datefmt='%Y-%m-%d %H:%M:%S'
+        format='%(asctime)s %(levelname)-8s %(message)s',
+        level=level,
+        datefmt='%Y-%m-%d %H:%M:%S'
     )
 
     crawler = Crawler()
