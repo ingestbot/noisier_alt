@@ -59,11 +59,11 @@ class Crawler(object):
         session = requests.Session()
 
         retry = Retry(
-                        total=3,
-                        backoff_factor=1,
-                        status_forcelist=[500, 502, 503, 504],
-                        allowed_methods=["HEAD", "GET", "OPTIONS", "POST"]
-                    )
+            total=3,
+            backoff_factor=1,
+            status_forcelist=[500, 502, 503, 504],
+            allowed_methods=["HEAD", "GET", "OPTIONS", "POST"]
+        )
 
         adapter = HTTPAdapter(max_retries=retry)
         session.mount('http://', adapter)
@@ -378,7 +378,8 @@ def main():
     logging.basicConfig(
       format='%(asctime)s %(levelname)-8s %(message)s',
       level=level,
-      datefmt='%Y-%m-%d %H:%M:%S')
+      datefmt='%Y-%m-%d %H:%M:%S'
+    )
 
     crawler = Crawler()
     crawler.load_config_file(args.config)
