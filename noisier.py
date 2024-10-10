@@ -7,24 +7,24 @@ import random
 import re
 import time
 import requests
-from requests.exceptions import SSLError, RequestException, ReadTimeout
+import requests.exceptions
+# from requests.exceptions import SSLError, RequestException, ReadTimeout
 from urllib.parse import urljoin, urlparse
 
 from urllib3.exceptions import LocationParseError
 
-##
-## See Crawler._request():
-##  - https://stackoverflow.com/questions/23013220/max-retries-exceeded-with-url-in-requests
-##
+#
+# See Crawler._request(): https://stackoverflow.com/q/23013220
+#
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 import logging
 
-##
-## This prevents WARNING messages from urllib3 appearing in 
-## default INFO logging.
-##
+#
+# This prevents WARNING messages from urllib3 appearing in 
+# default INFO logging.
+#
 logging.getLogger("urllib3").setLevel(logging.ERROR)
 
 
@@ -102,9 +102,9 @@ class Crawler(object):
     @staticmethod
     def _normalize_link(link, root_url):
         """
-        Normalizes links extracted from the DOM by making them all absolute, so
-        we can request them, for example, turns a "/images" link extracted from https://imgur.com
-        to "https://imgur.com/images"
+        Normalizes links extracted from the DOM by making them all absolute,
+        so we can request them, for example, turns a "/images" link extracted
+        from https://imgur.com to "https://imgur.com/images"
         :param link: link found in the DOM
         :param root_url: the URL the DOM was loaded from
         :return: absolute link
@@ -131,8 +131,8 @@ class Crawler(object):
     def _is_valid_url(url):
         """
         Check if a url is a valid url.
-        Used to filter out invalid values that were found in the "href" attribute,
-        for example "javascript:void(0)"
+        Used to filter out invalid values that were found in the "href" 
+        attribute, for example "javascript:void(0)"
         taken from https://stackoverflow.com/questions/7160737
         :param url: url to be checked
         :return: boolean indicating whether the URL is valid or not
@@ -155,9 +155,11 @@ class Crawler(object):
 
     def _should_accept_url(self, url):
         """
-        filters url if it is blacklisted or not valid, we put filtering logic here
+        filters url if it is blacklisted or not valid, we put filtering logic
+        here:
         :param url: full url to be checked
-        :return: boolean of whether or not the url should be accepted and potentially visited
+        :return: boolean of whether or not the url should be accepted and 
+         potentially visited
         """
         return url and self._is_valid_url(url) and not self._is_blacklisted(url)
 
@@ -193,9 +195,9 @@ class Crawler(object):
     def _browse_from_links(self, depth=0):
         """
         Selects a random link out of the available link list and visits it.
-        Blacklists any link that is not responsive or that contains no other links.
-        Please note that this function is recursive and will keep calling itself until
-        a dead end has reached or when we ran out of links
+        Blacklists any link that is not responsive or that contains no other 
+        links. Please note that this function is recursive and will keep calling 
+        itself until a dead end has reached or when we ran out of links
         :param depth: our current link depth
         """
 
@@ -261,8 +263,8 @@ class Crawler(object):
 
     def load_config_file(self, file_path):
         """
-        Loads and decodes a JSON config file, sets the config of the crawler instance
-        to the loaded one
+        Loads and decodes a JSON config file, sets the config of the crawler 
+        instance to the loaded one
         :param file_path: path of the config file
         :return:
         """
@@ -297,7 +299,8 @@ class Crawler(object):
         is specified then return false
         :return: boolean indicating whether the timeout has reached
         """
-        is_timeout_set = self._config["timeout"] is not False  # False is set when no timeout is desired
+        # False is set when no timeout is desired
+        is_timeout_set = self._config["timeout"] is not False
         end_time = self._start_time + datetime.timedelta(seconds=self._config["timeout"])
         is_timed_out = datetime.datetime.now() >= end_time
 
