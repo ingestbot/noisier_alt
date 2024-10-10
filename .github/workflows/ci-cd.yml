@@ -14,6 +14,10 @@ jobs:
     - name: Check out code
       uses: actions/checkout@v2
 
+    - name: Lint Code
+      run: |
+        flake8 .
+
     - name: Log in to Docker Hub
       uses: docker/login-action@v1
       with:
@@ -23,12 +27,33 @@ jobs:
     - name: Build the Docker image
       run: docker build . -t noisier
 
+    #- name: Run the Docker container | capture logs | verify Successful Visits
+    #  run: |
+    #    container_id=$(docker run -d noisier)
+    #    sleep 180
+    #    if docker logs "$container_id" 2>&1 | grep -q "Successful Visits"; then
+    #        echo "PASS"
+    #    else
+    #        echo "FAIL"
+    #    fi
+
     - name: Run the Docker container | capture logs | verify Successful Visits
       run: |
-        container_id=$(docker run -d noisier)
-        sleep 180
-        if docker logs "$container_id" 2>&1 | grep -q "Successful Visits"; then
-            echo "PASS"
-        else
-            echo "FAIL"
-        fi
+          container_id=$(docker run -d noisier)
+          timeout=180
+          interval=5
+          elapsed=0
+
+          while [ "$elapsed" -lt "$timeout" ]; do
+              if docker logs "$container_id" 2>&1 | grep -q "Successful Visits"; then
+                  echo "PASS"
+                  exit 0
+              fi
+              sleep "$interval"
+              elapsed=$((elapsed + interval))
+          done
+
+          echo "FAIL: Successful Visits not found within the timeout period."
+          docker logs "$container_id"
+          exit 1
+
