@@ -121,7 +121,6 @@ class Crawler(object):
         if link.startswith("//"):
             return f"{parsed_root_url.scheme}://{parsed_url.netloc}{parsed_url.path}"
 
-
         # possibly a relative path
         if not parsed_url.scheme:
             return urljoin(root_url, link)
@@ -159,7 +158,7 @@ class Crawler(object):
         filters url if it is blacklisted or not valid, we put filtering logic
         here:
         :param url: full url to be checked
-        :return: boolean of whether or not the url should be accepted and 
+        :return: boolean of whether or not the url should be accepted and
          potentially visited
         """
         return url and self._is_valid_url(url) and not self._is_blacklisted(url)
@@ -196,8 +195,8 @@ class Crawler(object):
     def _browse_from_links(self, depth=0):
         """
         Selects a random link out of the available link list and visits it.
-        Blacklists any link that is not responsive or that contains no other 
-        links. Please note that this function is recursive and will keep calling 
+        Blacklists any link that is not responsive or that contains no other
+        links. Please note that this function is recursive and will keep calling
         itself until a dead end has reached or when we ran out of links
         :param depth: our current link depth
         """
@@ -266,7 +265,7 @@ class Crawler(object):
 
     def load_config_file(self, file_path):
         """
-        Loads and decodes a JSON config file, sets the config of the crawler 
+        Loads and decodes a JSON config file, sets the config of the crawler
         instance to the loaded one
         :param file_path: path of the config file
         :return:
