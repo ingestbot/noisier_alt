@@ -22,7 +22,7 @@ from urllib3.util.retry import Retry
 import logging
 
 #
-# This prevents WARNING messages from urllib3 appearing in 
+# This prevents WARNING messages from urllib3 appearing in
 # default INFO logging.
 #
 logging.getLogger("urllib3").setLevel(logging.ERROR)
@@ -119,7 +119,8 @@ class Crawler(object):
 
         # '//' means keep the current protocol used to access this URL
         if link.startswith("//"):
-            return "{}://{}{}".format(parsed_root_url.scheme, parsed_url.netloc, parsed_url.path)
+            return f"{parsed_root_url.scheme}://{parsed_url.netloc}{parsed_url.path}"
+
 
         # possibly a relative path
         if not parsed_url.scheme:
@@ -131,7 +132,7 @@ class Crawler(object):
     def _is_valid_url(url):
         """
         Check if a url is a valid url.
-        Used to filter out invalid values that were found in the "href" 
+        Used to filter out invalid values that were found in the "href"
         attribute, for example "javascript:void(0)"
         taken from https://stackoverflow.com/questions/7160737
         :param url: url to be checked
@@ -226,12 +227,15 @@ class Crawler(object):
             logging.debug(f"Response: {response}")
 
             if response is None:
-                logging.debug(f"Skipping {random_link} due to request failure.")
+                logging.debug(
+                    f"Skipping {random_link} due to "
+                    "request failure."
+                )
                 self.count_bad_url += 1
 
                 return
 
-            sub_page = response.content  # Access .content only if response is not None
+            sub_page = response.content
 
             self.count_visit += 1
 
@@ -243,7 +247,6 @@ class Crawler(object):
                 logging.info(f"Invalid URLs: {self.count_bad_url}")
                 logging.info(f"Total KBytes Transferred: {self.kbytes_transferred:.2f}")
 
-            # sleep for a random amount of time
             time.sleep(random.randrange(self._config["min_sleep"], self._config["max_sleep"]))
 
             # make sure we have more than 1 link to pick from
