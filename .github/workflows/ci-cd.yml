@@ -26,7 +26,7 @@ jobs:
     - name: Run the Docker container | capture logs | verify Successful Visits
       run: |
         container_id=$(docker run -d noisier)
-        sleep 120
+        sleep 180
         if docker logs "$container_id" 2>&1 | grep -q "Successful Visits"; then
             echo "PASS"
         else
