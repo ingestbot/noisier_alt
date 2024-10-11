@@ -67,4 +67,4 @@ jobs:
         push: true
         tags: |
           ${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:latest
-          ${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:${{ github.sha }}  # Using commit SHA for versioning
+          ${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:${{ github.sha }}
