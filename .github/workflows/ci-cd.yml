@@ -63,8 +63,8 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         context: .
-        file: Dockerfile  # Update if your Dockerfile has a different name or location
+        file: Dockerfile
         push: true
         tags: |
           ${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:latest
-          ${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:${{ github.sha }}
+          ${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:${{ github.sha.substring(0, 7) }}
