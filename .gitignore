@@ -7,3 +7,4 @@
 *.pyc
 *.md
 *.swp
+__pycache__

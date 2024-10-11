@@ -1,13 +1,14 @@
-
 import sys
 import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from noisier import Crawler
 
 import datetime
 import requests
 import pytest
 from unittest.mock import patch, MagicMock
+
 
 @pytest.fixture
 def crawler():
@@ -20,27 +21,29 @@ def crawler():
         "min_sleep": 1,
         "max_sleep": 3,
         "blacklisted_urls": [],
-        "timeout": 2
+        "timeout": 2,
     }
     return crawler
 
-@patch('noisier.requests.Session')
+
+@patch("noisier.requests.Session")
 def test_request_success(mock_session, crawler):
     """Test the _request method for a successful response."""
     mock_response = MagicMock()
     mock_response.status_code = 200
-    mock_response.headers = {'Content-Length': '2048'}
-    mock_response.content = b'Some content'
+    mock_response.headers = {"Content-Length": "2048"}
+    mock_response.content = b"Some content"
 
     mock_session.return_value.get.return_value = mock_response
 
-    url = 'http://example.com'
+    url = "http://example.com"
     response = crawler._request(url)
 
     assert response == mock_response
     assert crawler.kbytes_transferred == 2.0  # 2048 bytes = 2 KB
 
-@patch('noisier.requests.Session')
+
+@patch("noisier.requests.Session")
 def test_request_http_error(mock_session, crawler):
     """Test the _request method for an HTTP error response."""
     mock_response = MagicMock()
@@ -49,35 +52,38 @@ def test_request_http_error(mock_session, crawler):
 
     mock_session.return_value.get.return_value = mock_response
 
-    url = 'http://example.com'
+    url = "http://example.com"
     response = crawler._request(url)
 
     assert response is None
     assert crawler.count_error == 1
 
-@patch('noisier.requests.Session')
+
+@patch("noisier.requests.Session")
 def test_request_timeout(mock_session, crawler):
     """Test the _request method for a read timeout exception."""
     mock_session.return_value.get.side_effect = requests.exceptions.ReadTimeout()
 
-    url = 'http://example.com'
+    url = "http://example.com"
     response = crawler._request(url)
 
     assert response is None
     assert crawler.count_error == 1
 
-@patch('noisier.requests.Session')
+
+@patch("noisier.requests.Session")
 def test_request_ssl_error(mock_session, crawler):
     """Test the _request method for an SSL error."""
     mock_session.return_value.get.side_effect = requests.exceptions.SSLError()
 
-    url = 'http://example.com'
+    url = "http://example.com"
     response = crawler._request(url)
 
     assert response is None
     assert crawler.count_error == 1
 
-@patch('noisier.requests.Session')
+
+@patch("noisier.requests.Session")
 def test_browse_from_links_no_links(mock_session, crawler):
     """Test _browse_from_links when there are no links to browse."""
     crawler._links = []  # No links available
@@ -87,7 +93,8 @@ def test_browse_from_links_no_links(mock_session, crawler):
 
     assert crawler.count_visit == 0  # Should not visit any links
 
-@patch('noisier.requests.Session')
+
+@patch("noisier.requests.Session")
 def test_browse_from_links_invalid_url(mock_session, crawler):
     """Test _browse_from_links when encountering an invalid URL."""
     crawler._links = ["http://invalid-url.com"]
@@ -104,4 +111,3 @@ def test_browse_from_links_invalid_url(mock_session, crawler):
 
     assert crawler.count_bad_url == 1  # Should increment bad URL count
     assert crawler.count_visit == 0  # Should not count as a visit
-
