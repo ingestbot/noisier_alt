@@ -1,31 +1,27 @@
-import socket
 import argparse
 import datetime
 import json
+import logging
 import random
 import re
+import socket
 import time
+from urllib.parse import urljoin, urlparse
 
 # import functools
 import requests
 import requests.exceptions
-
 #
 # https://prometheus.github.io/client_python/
 #
 # from prometheus_client import start_http_server, Summary, Counter
-from prometheus_client import start_http_server, Counter
-from urllib.parse import urljoin, urlparse
-
-from urllib3.exceptions import LocationParseError
-
+from prometheus_client import Counter, start_http_server
 #
 # See Crawler._request(): https://stackoverflow.com/q/23013220
 #
 from requests.adapters import HTTPAdapter
+from urllib3.exceptions import LocationParseError
 from urllib3.util.retry import Retry
-
-import logging
 
 #
 # This prevents WARNING messages from urllib3 appearing in

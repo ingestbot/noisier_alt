@@ -2,9 +2,9 @@ name: CI/CD Pipeline - noisier
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build:
@@ -14,76 +14,76 @@ jobs:
       contents: read
       packages: read
       # To report GitHub Actions status checks
-      statuses: write
+      # statuses: write
 
     env:
       DOCKER_USERNAME: ingestbot
       DOCKER_IMAGE_NAME: noisier_alt
 
-
     steps:
-    - name: Set up environment variables
-      # run: echo "SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-7)" >> $GITHUB_ENV
-      run: echo "SHORT_SHA=$(echo '${{ github.sha }}' | cut -c1-7)" >> $GITHUB_ENV
+      - name: Set up environment variables
+        # run: echo "SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-7)" >> $GITHUB_ENV
+        # run: echo "SHORT_SHA=$(echo '${{ github.sha }}' | cut -c1-7)" >> $GITHUB_ENV
+        run: echo "SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)" >> $GITHUB_ENV
 
-    - name: Check out code
-      # uses: actions/checkout@v2
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      - name: Check out code
+        # uses: actions/checkout@v2
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Install Dependencies
-      run: pip install -r requirements-ci.txt
+      - name: Install Dependencies
+        run: pip install -r requirements-ci.txt
 
-    - name: TruffleHog OSS
-      uses: trufflesecurity/trufflehog@v3.82.8
+      - name: TruffleHog OSS
+        uses: trufflesecurity/trufflehog@v3.82.8
 
-    - name: Super-Linter
-      uses: super-linter/super-linter@v7.1.0
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Super-Linter
+        uses: super-linter/super-linter@v7.1.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    #- name: Lint Code
-    #  run: |
-    #    flake8 .
+      #- name: Lint Code
+      #  run: |
+      #    flake8 .
 
-    - name: Run tests
-      run: |
-        PYTHONPATH=. pytest tests/test_main.py -vv
+      - name: Run tests
+        run: |
+          PYTHONPATH=. pytest tests/test_main.py -vv
 
-    - name: Docker Login
-      uses: docker/login-action@v3.3.0
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Docker Login
+        uses: docker/login-action@v3.3.0
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-    #
-    # https://github.com/marketplace/actions/docker-setup-buildx
-    #
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
+      #
+      # https://github.com/marketplace/actions/docker-setup-buildx
+      #
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-    # - name: Build the Docker image
-    #  run: |
-    #    docker buildx build --load -t noisier .
+      # - name: Build the Docker image
+      #  run: |
+      #    docker buildx build --load -t noisier .
 
-    - name: build local container
-      uses: docker/build-push-action@v4
-      with:
-        # tags: localbuild/testimage:latest
-        tags: localbuild/testimage
-        push: false
-        load: true
+      - name: build local container
+        uses: docker/build-push-action@v4
+        with:
+          # tags: localbuild/testimage:latest
+          tags: localbuild/testimage
+          push: false
+          load: true
 
-    - name: Anchore Container Scan
-      # uses: anchore/scan-action@v3
-      uses: anchore/scan-action@v5.0.0
-      with:
-        # image: "localbuild/testimage:latest"
-        image: "localbuild/testimage"
+      - name: Anchore Container Scan
+        # uses: anchore/scan-action@v3
+        uses: anchore/scan-action@v5.0.0
+        with:
+          # image: "localbuild/testimage:latest"
+          image: "localbuild/testimage"
 
-    - name: Run the Docker container | capture logs | verify Successful Visits
-      run: |
+      - name: Run the Docker container | capture logs | verify Successful Visits
+        run: |
           container_id=$(docker run -d localbuild/testimage)
           timeout=180
           interval=5
@@ -102,14 +102,13 @@ jobs:
           docker logs "$container_id"
           exit 1
 
-    - name: Build and push Docker image
-      # uses: docker/build-push-action@v3
-      uses: docker/build-push-action@v4
-      with:
-        context: .
-        file: Dockerfile
-        push: true
-        tags: |
-          ${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:latest
-          ${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:${{ env.SHORT_SHA }}
-
+      - name: Build and push Docker image
+        # uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: |
+            ${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:latest
+            ${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:${{ env.SHORT_SHA }}
