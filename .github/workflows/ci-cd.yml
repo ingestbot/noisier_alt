@@ -23,7 +23,7 @@ jobs:
       run: echo "SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-7)" >> $GITHUB_ENV
 
     - name: Install Dependencies
-      run: pip install -r requirements.txt
+      run: pip install -r requirements-ci.txt
 
     - name: TruffleHog OSS
       uses: trufflesecurity/trufflehog@v3.82.8
