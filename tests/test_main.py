@@ -10,10 +10,11 @@ from noisier import Crawler
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def crawler():
     """Fixture to create a Crawler instance with a mock configuration."""
     crawler = Crawler()
+    crawler.count_error = 0
     crawler._config = {
         "user_agents": ["Mozilla/5.0", "Safari/537.36", "Chrome/91.0"],
         "max_depth": 3,
@@ -64,6 +65,8 @@ def test_request_timeout(mock_session, crawler):
     """Test the _request method for a read timeout exception."""
     mock_session.return_value.get.side_effect = requests.exceptions.ReadTimeout()
 
+    crawler.count_error = 0
+
     url = "http://example.com"
     response = crawler._request(url)
 
@@ -75,6 +78,8 @@ def test_request_timeout(mock_session, crawler):
 def test_request_ssl_error(mock_session, crawler):
     """Test the _request method for an SSL error."""
     mock_session.return_value.get.side_effect = requests.exceptions.SSLError()
+
+    crawler.count_error = 0
 
     url = "http://example.com"
     response = crawler._request(url)
