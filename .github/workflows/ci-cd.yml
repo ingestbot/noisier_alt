@@ -49,14 +49,19 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
-    - name: Build the Docker image
-      run: docker build . -t noisier
+
+    # - name: Build the Docker image
+    #  run: docker build . -t noisier
 
     #
     # https://github.com/marketplace/actions/docker-setup-buildx
     #
-    # - name: Set up Docker Buildx
-    #  uses: docker/setup-buildx-action@v3
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build the Docker image
+      run: |
+        docker buildx build -t noisier .
 
     - name: Run the Docker container | capture logs | verify Successful Visits
       run: |
