@@ -42,6 +42,7 @@ def time_it(metric):
 
 
 class Crawler(object):
+
     def __init__(self):
         """
         Initializes the Crawl class
