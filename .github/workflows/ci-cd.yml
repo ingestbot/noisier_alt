@@ -14,10 +14,10 @@ jobs:
       DOCKER_USERNAME: ingestbot
       DOCKER_IMAGE_NAME: noisier_alt
 
-
     steps:
     - name: Check out code
-      uses: actions/checkout@v2
+      # uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Set up environment variables
       run: echo "SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-7)" >> $GITHUB_ENV
@@ -25,9 +25,15 @@ jobs:
     - name: Install Dependencies
       run: pip install -r requirements.txt
 
-    - name: Lint Code
-      run: |
-        flake8 .
+    - name: TruffleHog OSS
+      uses: trufflesecurity/trufflehog@v3.82.8
+
+    - name: Super-Linter
+      uses: super-linter/super-linter@v7.1.0
+
+    #- name: Lint Code
+    #  run: |
+    #    flake8 .
 
     - name: Run tests
       run: |
@@ -43,6 +49,12 @@ jobs:
 
     - name: Build the Docker image
       run: docker build . -t noisier
+
+    #
+    # https://github.com/marketplace/actions/docker-setup-buildx
+    #
+    # - name: Set up Docker Buildx
+    #  uses: docker/setup-buildx-action@v3
 
     - name: Run the Docker container | capture logs | verify Successful Visits
       run: |
