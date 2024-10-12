@@ -7,4 +7,5 @@
 *.pyc
 *.md
 *.swp
+*.bk
 __pycache__

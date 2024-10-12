@@ -1,4 +1,3 @@
-
 import socket
 import argparse
 import datetime
@@ -6,9 +5,11 @@ import json
 import random
 import re
 import time
+
 # import functools
 import requests
 import requests.exceptions
+
 #
 # https://prometheus.github.io/client_python/
 #
@@ -32,7 +33,7 @@ import logging
 #
 logging.getLogger("urllib3").setLevel(logging.ERROR)
 
-'''
+"""
 def time_it(metric):
     def decorator(func):
         @functools.wraps(func)
@@ -41,7 +42,7 @@ def time_it(metric):
                 return func(*args, **kwargs)
         return wrapper
     return decorator
-'''
+"""
 
 
 class Crawler(object):
@@ -59,10 +60,18 @@ class Crawler(object):
 
         # Prometheus Metrics
         # self.request_time = Summary('crawler_request_processing_seconds', 'Time spent processing requests')
-        self.prom_count_visit = Counter('crawler_count_visit', 'Total visits made by the crawler')
-        self.prom_count_error = Counter('crawler_count_error', 'Total errors encountered by the crawler')
-        self.prom_count_bad_url = Counter('crawler_bad_url', 'Total bad URLs encountered by the crawler')
-        self.prom_kbytes_transferred = Counter('crawler_kbytes_transferred', 'Total Kilobytes transferred by the crawler')
+        self.prom_count_visit = Counter(
+            "crawler_count_visit", "Total visits made by the crawler"
+        )
+        self.prom_count_error = Counter(
+            "crawler_count_error", "Total errors encountered by the crawler"
+        )
+        self.prom_count_bad_url = Counter(
+            "crawler_bad_url", "Total bad URLs encountered by the crawler"
+        )
+        self.prom_kbytes_transferred = Counter(
+            "crawler_kbytes_transferred", "Total Kilobytes transferred by the crawler"
+        )
 
         # self.crawl = time_it(self.request_time)(self.crawl)
 
