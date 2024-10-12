@@ -11,11 +11,13 @@ from urllib.parse import urljoin, urlparse
 # import functools
 import requests
 import requests.exceptions
+
 #
 # https://prometheus.github.io/client_python/
 #
 # from prometheus_client import start_http_server, Summary, Counter
 from prometheus_client import Counter, start_http_server
+
 #
 # See Crawler._request(): https://stackoverflow.com/q/23013220
 #
